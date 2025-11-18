@@ -32,6 +32,9 @@ export async function getCollections() {
     return res.json();
 }
 
+// Alias for getCollections to support static generation
+export const getCategories = getCollections;
+
 export async function getProductsByCategory(slug: string): Promise<Product[]> {
     // First get the category ID from the slug
     const categories = await getCollections();
