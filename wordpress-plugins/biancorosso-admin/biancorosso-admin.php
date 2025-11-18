@@ -16,7 +16,31 @@ class BiancoRosso_Admin_Settings {
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
 		add_action( 'rest_api_init', array( $this, 'register_rest_route' ) );
+		add_action( 'rest_api_init', array( $this, 'add_cors_headers' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_media_uploader' ) );
+	}
+
+	public function add_cors_headers() {
+		remove_filter( 'rest_pre_serve_request', 'rest_send_cors_headers' );
+		add_filter( 'rest_pre_serve_request', function( $served, $result, $request, $server ) {
+			$allowed_origins = array(
+				'http://localhost:5173',
+				'http://localhost:3000',
+				'https://biancorossowebsite.socratisp.com'
+			);
+			
+			$origin = isset( $_SERVER['HTTP_ORIGIN'] ) ? $_SERVER['HTTP_ORIGIN'] : '';
+			
+			if ( in_array( $origin, $allowed_origins ) ) {
+				header( 'Access-Control-Allow-Origin: ' . $origin );
+			}
+			
+			header( 'Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS' );
+			header( 'Access-Control-Allow-Headers: Content-Type, Authorization' );
+			header( 'Access-Control-Allow-Credentials: true' );
+			
+			return $served;
+		}, 15, 4 );
 	}
 
 	public function add_admin_menu() {

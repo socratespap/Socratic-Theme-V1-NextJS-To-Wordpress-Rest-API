@@ -20,6 +20,30 @@ class BiancoRosso_Commerce {
 
 		register_activation_hook( __FILE__, array( $this, 'create_orders_table' ) );
 		add_action( 'rest_api_init', array( $this, 'register_api_routes' ) );
+		add_action( 'rest_api_init', array( $this, 'add_cors_headers' ) );
+	}
+
+	public function add_cors_headers() {
+		remove_filter( 'rest_pre_serve_request', 'rest_send_cors_headers' );
+		add_filter( 'rest_pre_serve_request', function( $served, $result, $request, $server ) {
+			$allowed_origins = array(
+				'http://localhost:5173',
+				'http://localhost:3000',
+				'https://biancorossowebsite.socratisp.com'
+			);
+			
+			$origin = isset( $_SERVER['HTTP_ORIGIN'] ) ? $_SERVER['HTTP_ORIGIN'] : '';
+			
+			if ( in_array( $origin, $allowed_origins ) ) {
+				header( 'Access-Control-Allow-Origin: ' . $origin );
+			}
+			
+			header( 'Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS' );
+			header( 'Access-Control-Allow-Headers: Content-Type, Authorization' );
+			header( 'Access-Control-Allow-Credentials: true' );
+			
+			return $served;
+		}, 15, 4 );
 	}
 
 	public function create_orders_table() {
