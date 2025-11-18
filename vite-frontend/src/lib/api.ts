@@ -78,13 +78,28 @@ function transformProduct(item: any): Product {
         price: item.price || "0",
         description: item.content.rendered,
         short_description: item.excerpt.rendered,
-        images: item._embedded?.["wp:featuredmedia"]?.map((media: any) => ({
-            src: media.source_url,
-            alt: media.alt_text,
-        })) || [],
+        images: [
+            ...(item._embedded?.["wp:featuredmedia"]?.map((media: any) => ({
+                src: media.source_url,
+                alt: media.alt_text,
+            })) || []),
+            ...(item.gallery_images || [])
+        ],
         stock_quantity: parseInt(item.stock_quantity) || 0,
-        categories: [],
-        materials: [],
-        collections: [],
+        categories: item._embedded?.["wp:term"]?.flat().filter((t: any) => t.taxonomy === "product_cat").map((term: any) => ({
+            id: term.id,
+            name: term.name,
+            slug: term.slug,
+        })) || [],
+        materials: item._embedded?.["wp:term"]?.flat().filter((t: any) => t.taxonomy === "material").map((term: any) => ({
+            id: term.id,
+            name: term.name,
+            slug: term.slug,
+        })) || [],
+        collections: item._embedded?.["wp:term"]?.flat().filter((t: any) => t.taxonomy === "collection").map((term: any) => ({
+            id: term.id,
+            name: term.name,
+            slug: term.slug,
+        })) || [],
     };
 }

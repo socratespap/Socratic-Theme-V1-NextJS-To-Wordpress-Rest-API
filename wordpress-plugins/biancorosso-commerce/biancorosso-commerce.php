@@ -21,6 +21,39 @@ class BiancoRosso_Commerce {
 		register_activation_hook( __FILE__, array( $this, 'create_orders_table' ) );
 		add_action( 'rest_api_init', array( $this, 'register_api_routes' ) );
 		add_action( 'rest_api_init', array( $this, 'add_cors_headers' ) );
+		add_action( 'rest_api_init', array( $this, 'register_gallery_images_field' ) );
+	}
+
+	public function register_gallery_images_field() {
+		register_rest_field( 'product', 'gallery_images', array(
+			'get_callback' => array( $this, 'get_gallery_images' ),
+			'schema'       => null,
+		) );
+	}
+
+	public function get_gallery_images( $object ) {
+		$gallery_ids = get_post_meta( $object['id'], '_product_image_gallery', true );
+		
+		if ( empty( $gallery_ids ) ) {
+			return array();
+		}
+
+		$ids = explode( ',', $gallery_ids );
+		$images = array();
+
+		foreach ( $ids as $id ) {
+			$url = wp_get_attachment_url( $id );
+			$alt = get_post_meta( $id, '_wp_attachment_image_alt', true );
+			
+			if ( $url ) {
+				$images[] = array(
+					'src' => $url,
+					'alt' => $alt,
+				);
+			}
+		}
+
+		return $images;
 	}
 
 	public function add_cors_headers() {
