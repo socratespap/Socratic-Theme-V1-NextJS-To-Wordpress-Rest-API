@@ -18,6 +18,51 @@ class BiancoRosso_Admin_Settings {
 		add_action( 'rest_api_init', array( $this, 'register_rest_route' ) );
 		add_action( 'rest_api_init', array( $this, 'add_cors_headers' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_media_uploader' ) );
+		
+		// Hook into option updates to trigger cache purge
+		add_action( 'updated_option', array( $this, 'clear_caches_on_save' ), 10, 3 );
+	}
+
+	/**
+	 * Clears various caches when a Biancorosso setting is updated.
+	 *
+	 * @param string $option    Name of the updated option.
+	 * @param mixed  $old_value The old option value.
+	 * @param mixed  $value     The new option value.
+	 */
+	public function clear_caches_on_save( $option, $old_value, $value ) {
+		// Only run if it's one of our settings
+		if ( strpos( $option, 'biancorosso_' ) !== 0 ) {
+			return;
+		}
+
+		// 1. Standard WordPress Object Cache
+		wp_cache_flush();
+
+		// 2. LiteSpeed Cache
+		if ( has_action( 'litespeed_purge_all' ) ) {
+			do_action( 'litespeed_purge_all' );
+		}
+
+		// 3. W3 Total Cache
+		if ( function_exists( 'w3tc_flush_all' ) ) {
+			w3tc_flush_all();
+		}
+
+		// 4. WP Rocket
+		if ( function_exists( 'rocket_clean_domain' ) ) {
+			rocket_clean_domain();
+		}
+
+		// 5. Autoptimize
+		if ( class_exists( 'autoptimizeCache' ) ) {
+			autoptimizeCache::clearall();
+		}
+
+		// 6. WP Super Cache
+		if ( function_exists( 'wp_cache_clear_cache' ) ) {
+			wp_cache_clear_cache();
+		}
 	}
 
 	public function add_cors_headers() {
