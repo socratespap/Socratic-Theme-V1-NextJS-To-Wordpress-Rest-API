@@ -75,6 +75,11 @@ class BiancoRosso_Admin_Settings {
 			'sanitize_callback' => 'sanitize_textarea_field',
 			'default' => 'Handcrafted jewelry designed to elevate your everyday style.',
 		) );
+		register_setting( 'biancorosso_settings', 'biancorosso_categories_style', array(
+			'type' => 'string',
+			'sanitize_callback' => 'sanitize_text_field',
+			'default' => 'circled',
+		) );
 	}
 
 	public function enqueue_media_uploader( $hook ) {
@@ -99,6 +104,7 @@ class BiancoRosso_Admin_Settings {
 		$hero_alt = get_option( 'biancorosso_hero_alt', 'Jewelry Hero' );
 		$hero_heading = get_option( 'biancorosso_hero_heading', 'Timeless Elegance' );
 		$hero_description = get_option( 'biancorosso_hero_description', 'Handcrafted jewelry designed to elevate your everyday style.' );
+		$categories_style = get_option( 'biancorosso_categories_style', 'circled' );
 		?>
 		<div class="wrap">
 			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
@@ -217,6 +223,24 @@ class BiancoRosso_Admin_Settings {
 										</p>
 									</td>
 								</tr>
+								<tr>
+									<th scope="row">
+										<label for="biancorosso_categories_style"><?php _e( 'Categories Display Style', 'biancorosso' ); ?></label>
+									</th>
+									<td>
+										<select id="biancorosso_categories_style" name="biancorosso_categories_style" class="regular-text">
+											<option value="circled" <?php selected( $categories_style, 'circled' ); ?>>
+												<?php _e( 'Circled', 'biancorosso' ); ?>
+											</option>
+											<option value="squared" <?php selected( $categories_style, 'squared' ); ?>>
+												<?php _e( 'Squared', 'biancorosso' ); ?>
+											</option>
+										</select>
+										<p class="description">
+											<?php _e( 'Choose how categories should appear on the homepage - circular or square shape.', 'biancorosso' ); ?>
+										</p>
+									</td>
+								</tr>
 							</table>
 
 							<div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd;">
@@ -288,6 +312,7 @@ class BiancoRosso_Admin_Settings {
 			'hero_alt' => get_option( 'biancorosso_hero_alt', 'Jewelry Hero' ),
 			'hero_heading' => get_option( 'biancorosso_hero_heading', 'Timeless Elegance' ),
 			'hero_description' => get_option( 'biancorosso_hero_description', 'Handcrafted jewelry designed to elevate your everyday style.' ),
+			'categories_style' => get_option( 'biancorosso_categories_style', 'circled' ),
 		);
 	}
 }

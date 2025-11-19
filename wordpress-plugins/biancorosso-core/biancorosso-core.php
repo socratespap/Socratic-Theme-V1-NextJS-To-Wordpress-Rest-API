@@ -3,7 +3,7 @@
  * Plugin Name: BiancoRosso Core
  * Description: Core functionality for BiancoRosso Headless E-commerce (CPT, Taxonomies).
  * Version: 1.0.0
- * Author: Antigravity
+ * Author: socratisp.com
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
